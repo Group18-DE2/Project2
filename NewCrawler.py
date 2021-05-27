@@ -11,7 +11,6 @@
 #############
 # Libraries #
 #############
-
 import wget
 import time
 import simplejson
@@ -29,12 +28,11 @@ from datetime import datetime, timedelta
 TOKEN ="Authorization:token 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"
 URL = f'https://api.github.com/search/repositories?q=created:SINCE..UNTIL&per_page=100'
 OUTPUT_FOLDER = "/zips" #Folder where ZIP files will be stored
-OUTPUT_CSV_FILE = "repositories.csv" #Path to the CSV file generated as output
+OUTPUT_CSV_FILE = "languages.csv" #Path to the CSV file generated as output
 
 #############
 # Functions #
 #############
-
 def getUrl (url):
 
     ''' Given a URL it returns its body '''
@@ -56,17 +54,6 @@ def getUrl (url):
 ########
 
 #To save the number of repositories processed
-countOfRepositories = 0
-
-#Output CSV file which will contain information about repositories
-csvfile = open(OUTPUT_CSV_FILE, 'w')
-languages_count = csv.writer(csvfile, delimiter=',')
-project_commits = csv.writer(csvfile, delimiter=',')
-languages = []
-reponames = []
-filenames = []
-question2 = []
-
 since = datetime.today() - timedelta(days=30)  # Since 30 days ago
 until = since + timedelta(days=1)   # Until 29 days ago 
 #To save the number of repositories processed
@@ -77,18 +64,21 @@ csvfile = open(OUTPUT_CSV_FILE, 'w')
 languages_count = csv.writer(csvfile, delimiter=',')
 
 while until < datetime.today():
-    day_url = URL.replace('SINCE', since.strftime('%Y-%m-%dT%H:%M:%SZ')).replace('UNTIL', until.strftime('%Y-%m-%dT%H:%M:%SZ'))
-    dataRead = simplejson.loads(getUrl(day_url))
-
-    #Iteration over all the repositories in the current json content page
-    for item in dataRead['items']:
-        #Obtain
-        languages_count.writerow([item['language'], 1])
-        countOfRepositories = countOfRepositories + 1
-
-    # Update dates for the next search
-    since = until
-    until = since + timedelta(days=1)
+     for currentPage in range(1, 11):
+         print("page number " + str(currentPage))
+         day_url = URL.replace('SINCE', since.strftime('%Y-%m-%dT%H:%M:%SZ')).replace('UNTIL', until.strftime('%Y-%m-%dT%H:%M:%SZ'))
+         url = day_url + "&page=" + str(currentPage)                                                           
+         dataRead = simplejson.loads(getUrl(url))
+         #Iteration over all the repositories in the current json content page
+         for item in dataRead['items']:
+             language = [item['language']
+             if(language != None): 
+                 languages_count.writerow(, 1])
+             countOfRepositories = countOfRepositories + 1
+     # Update dates for the next search
+     since = until
+     until = since + timedelta(days=1)
+     time.sleep(10)
 
 print("DONE! " + str(countOfRepositories) + " repositories have been processed.")
 csvfile.close()
