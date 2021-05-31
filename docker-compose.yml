@@ -1,0 +1,117 @@
+version: "3"
+
+services:
+
+  pulsar:
+    image: apachepulsar/pulsar:2.7.0
+    hostname: pulsar
+    container_name: pulsar
+    restart: always
+    expose:
+      - "8080"
+      - "6650"
+    ports:
+      - "8080:8080"
+      - "6650:6650"
+    environment:
+      PULSAR_MEM: " -Xms512m -Xmx512m -XX:MaxDirectMemorySize=1g"
+    command: bin/pulsar standalone
+
+  single_producer:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    hostname: single_producer
+#    container_name: single_producer
+#    restart: always
+    depends_on:
+      - pulsar
+    links:
+      - pulsar
+    volumes:
+      - .:/app
+    command: python3 -m single_producer
+
+  middle_layer_consumer:
+    build:
+      context: .
+    hostname: middle_layer_consumer
+#    container_name: middle_layer_consumer
+#    restart: always
+    depends_on:
+      - pulsar
+    links:
+      - pulsar
+    volumes:
+      - .:/app
+    command: python3 -m  middle_layer_consumer
+
+  middle_prgm_commit:
+    build:
+      context: .
+    hostname: middle_prgm_commit
+#    container_name: middle_prgm_commit
+#    restart: always
+    depends_on:
+      - pulsar
+    links:
+      - pulsar
+    volumes:
+      - .:/app
+    command: python3 -m  middle_prgm_commit
+
+  middle_test_lang:
+    build:
+      context: .
+    hostname: middle_test_lang
+#    container_name: middle_test_lang
+#    restart: always
+    depends_on:
+      - pulsar
+    links:
+      - pulsar
+    volumes:
+      - .:/app
+    command: python3 -m  middle_test_lang
+
+  final_prgm_commit:
+    build:
+      context: .
+    hostname: final_prgm_commit
+#    container_name: final_prgm_commit
+#    restart: always
+    depends_on:
+      - pulsar
+    links:
+      - pulsar
+    volumes:
+      - .:/app
+    command: python3 -m final_prgm_commit
+
+  final_test_lang:
+    build:
+      context: .
+    hostname: final_test_lang
+#    container_name: final_test_lang
+#    restart: always
+    depends_on:
+      - pulsar
+    links:
+      - pulsar
+    volumes:
+      - .:/app
+    command: python3 -m final_test_lang
+
+  consumer_final:
+    build:
+      context: .
+    hostname: consumer_final
+#    container_name: consumer_final
+#    restart: always
+    depends_on:
+      - pulsar
+    links:
+      - pulsar
+    volumes:
+      - .:/app
+    command: python3 -m consumer_final
