@@ -12,7 +12,8 @@ class LanguageCount(Record):
     count = Integer()
     
 # Create a pulsar client by supplying ip address and port
-client = pulsar.Client('pulsar://localhost:6650')
+#client = pulsar.Client('pulsar://localhost:6650')
+client = pulsar.Client('pulsar://pulsar:6650')
 
 # Subscribe to a topic and subscription
 consumer = client.subscribe(topic='Languages_1', subscription_name='Question_1', schema=AvroSchema(LanguageCount))
